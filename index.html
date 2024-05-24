@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <style>
+        body{
+            text-align: center;
+            background-color: rgb(240, 230, 213);
+            font-family: "Rubik", sans-serif;
+        }
+
+        .button {
+            background-color: #04AA6D;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        *{
+            padding: 0;
+            margin: 0;
+        }
+
+        h1{
+            font-family: "Poetsen One", sans-serif;
+            font-size: 50px;
+        }
+
+        .main{
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+        }
+        .items{
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            height: 200px;
+        }
+        .product { 
+            margin-bottom: 10px; 
+            width: 150px; 
+            height: 150px;
+            padding: 25px;
+            padding-bottom: 50px;
+            padding-left: 10px;
+            border-radius: 5px;
+        }
+        .cart { 
+            max-height: 30px; 
+            overflow-y: auto; 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+        }
+        .cart-item { 
+            margin-bottom: 10px; }
+        .total { 
+            font-weight: bold; 
+            margin-top: 10px; }
+        .cart-area{
+            width: 100vh;
+        }
+        .categ-1{
+            border: black;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            background-color: #DDE8B9ff;
+        }
+        .categ-2{
+            border: black;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            background-color: #A57578ff;
+        }
+        .categ-3{
+            border: black;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            background-color: #DDE7B8ff;
+        }
+        .categ-4{
+            border: black;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            background-color: #CB8589ff;
+        }
+        p{
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let cart = [];
+        let productsInCart = new Set();
+
+        function addToCart(productId, productName, productPrice) {
+            if (productsInCart.has(productId)) {
+                alert("This product is already in the cart.");
+                return;
+            }
+
+            const product = { id: productId, name: productName, price: productPrice, quantity: 1, totalPrice: productPrice };
+            cart.push(product);
+            productsInCart.add(productId);
+            renderCart();
+        }
+
+        function removeFromCart(productId) {
+            const productIndex = cart.findIndex(item => item.id === productId);
+            if (productIndex !== -1) {
+                cart.splice(productIndex, 1);
+                productsInCart.delete(productId);
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const cartContainer = document.getElementById('cart');
+            cartContainer.innerHTML = '';
+
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    ${item.name} - $${item.price.toFixed(2)} x ${item.quantity} = $${item.totalPrice.toFixed(2)}
+                    <button onclick="removeFromCart(${item.id})">Remove</button>
+                `;
+                cartContainer.appendChild(cartItem);
+            });
+
+            updateTotalPrice();
+            updateOrderField();
+        }
+
+        function updateTotalPrice() {
+            const totalPrice = cart.reduce((total, item) => total + item.totalPrice, 0);
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+        }
+
+        function updateOrderField() {
+            const orderField = document.getElementById('cust_order');
+            const orderDetails = cart.map(item => ({
+                prod_name: item.name,
+                prod_price: item.price,
+                quantity: item.quantity,
+                total_price: item.totalPrice
+            }));
+            orderField.value = JSON.stringify(orderDetails);
+        }
+
+        document.getElementById('order-form').addEventListener('submit', function(event) {
+            updateOrderField();
+        });
+
+        renderCart();
+    </script>
+    <h1>-CHIC HAVEN-</h1>
+    <p>Welcome to Chic Haven! Look for your perfect fit, right here, in Chic Haven!
+    <a href="about.html">About the shop: CREATORS</a></p>
+    <div class="main">
+        <div class="items">
+        <div class="categ-1">
+            <h3>DRESSES!</h3>
+            <div class="product" data-id="1" data-name="Item 1" data-price="10" style="background: url(yellow_dress.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>DRESS 1 - $10 <button onclick="addToCart(1, 'DRESS 1', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="2" data-name="Item 2" data-price="20" style="background: url(pink_dress.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>DRESS 2 - $20 <button onclick="addToCart(2, 'DRESS 2', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="3" data-name="Item 3" data-price="30" style="background: url(green_dress.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>DRESS 3 - $30 <button onclick="addToCart(3, 'DRESS 3', 30)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="4" data-name="Item 4" data-price="10" style="background: url(purple_dress.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>DRESS 4 - $10 <button onclick="addToCart(4, 'DRESS 4', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="5" data-name="Item 5" data-price="20" style="background: url(red_dress.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>DRESS 5 - $20 <button onclick="addToCart(5, 'DRESS 5', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+        </div>
+        <div class="categ-2">
+            <h3>SHIRTS!</h3>
+            <div class="product" data-id="6" data-name="Item 6" data-price="10" style="background: url(tiwed.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>TIWED - $10 <button onclick="addToCart(6, 'TIWED', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="7" data-name="Item 2" data-price="20" style="background: url(nyamazing.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>NYAMAZING - $20 <button onclick="addToCart(7, 'NYAMAZING', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="8" data-name="Item 8" data-price="30" style="background: url(wow.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>SHOOK - $30 <button onclick="addToCart(8, 'SHOOK', 30)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="9" data-name="Item 9" data-price="10" style="background: url(banana.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>BANANA CAT - $10 <button onclick="addToCart(9, 'BANANA CAT', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="10" data-name="Item 10" data-price="20" style="background: url(sad.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>SAD - $20 <button onclick="addToCart(10, 'SAD', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+        </div>
+        <div class="categ-3">
+            <h3>BOTTOMWEAR!</h3>
+            <div class="product" data-id="11" data-name="Item 11" data-price="10" style="background: url(jogging.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>JOGGING - $10 <button onclick="addToCart(11, 'JOGGING', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="12" data-name="Item 12" data-price="20" style="background: url(layingdown.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>LAYING DOWN - $20 <button onclick="addToCart(12, 'LAYING DOWN', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="13" data-name="Item 13" data-price="30" style="background: url(stand.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>STANDING - $30 <button onclick="addToCart(13, 'STANDING', 30)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="14" data-name="Item 14" data-price="10" style="background: url(blueshort.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>BLUE SHORTS - $10 <button onclick="addToCart(14, 'BLUE SHORTS', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="15" data-name="Item 15" data-price="20" style="background: url(darkshort.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>DARK SHORTS - $20 <button onclick="addToCart(15, 'DARK SHORTS', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+        </div>
+        <div class="categ-4">
+            <h3>HATS!</h3>
+            <div class="product" data-id="16" data-name="Item 16" data-price="10" style="background: url(flowerhat.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>FLOWER HAT - $10 <button onclick="addToCart(16, 'FLOWER HAT', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="17" data-name="Item 17" data-price="20" style="background: url(greenhat.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>GREEN HAT - $20 <button onclick="addToCart(17, 'GREEN HAT', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="18" data-name="Item 18" data-price="30" style="background: url(redhat.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>RED HAT - $30 <button onclick="addToCart(18, 'RED HAT', 30)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="19" data-name="Item 19" data-price="10" style="background: url(gray.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>GRAY HAT - $10 <button onclick="addToCart(19, 'GRAY HAT', 10)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+            <br><br><br>
+            <div class="product" data-id="10" data-name="Item 20" data-price="20" style="background: url(smile.png); background-size: contain;">
+                <br><br><br><br><br><br><br><br><br>SMILE! - $20 <button onclick="addToCart(20, 'SMILE!', 20)" style="border-radius: 5px; background-color: #ccc;">Add to Cart</button>
+            </div>
+        </div>
+        </div>
+        <div class="cart-area">
+            <h2>Cart</h2>
+            <div id="cart" class="cart"></div>
+            <div class="total">Total: $<span id="total-price">0</span></div>
+
+            <h2>Details</h2>
+            <form id="order-form" method="GET" action="http://sirjm.infinityfreeapp.com/checkout.php">
+                <label for="cust_name">Name:</label>
+                <input type="text" id="cust_name" name="cust_name" required><br>
+                <label for="cust_addr">Address:</label>
+                <input type="text" id="cust_addr" name="cust_addr" required><br>
+                <label for="cust_email">Email:</label>
+                <input type="email" id="cust_email" name="cust_email" required><br>
+                <input type="hidden" id="cust_order" name="cust_order">
+                <button type="submit">Submit Order</button>
+            </form>
+        </div>
+  </div>
+</body>
+</html>
